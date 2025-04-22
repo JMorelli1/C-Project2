@@ -11,7 +11,6 @@ namespace CpuSchedulingWinForms
 
         private List<TextBox> arrivalTimeTextBoxes = new List<TextBox>();
         private List<TextBox> priorityTextBoxes = new List<TextBox>();
-        private TextBox quantumTimeTextBox = null;
         int numOfProcesses = 0;
 
         public AlgorithmOptionsForm(object type, int np)
@@ -28,28 +27,20 @@ namespace CpuSchedulingWinForms
         private void CreateDynamicForm()
         {
             String selectedType = (String) this.Tag;
-            int topMargin = 20;
+            int topMargin = 0;
 
             for (int i = 0; i < numOfProcesses; i++){
+                topMargin += 30;
                 CreateFormOption("Burst Time P" + i, "burst", topMargin);
+                topMargin += 30;
+                CreateFormOption("Arrival Time P" + i, "arrival", topMargin);
 
                 if(selectedType == "PRIORITY"){
                     topMargin += 30;
                     CreateFormOption("Priority of P" + i, "priority", topMargin);
-                }
-
-                if(selectedType == "RR"){
-                    topMargin += 30;
-                    CreateFormOption("Arrival Time P" + i, "arrival", topMargin);
-                }
-
-                topMargin += 30;
+                }   
             }
-
-            if(selectedType == "RR"){
-                    CreateFormOption("Quantum Time", "quantum", topMargin);
-                    topMargin += 30;
-                }
+            topMargin += 30;
 
             // Submit Button
             Button submitButton = new Button();
@@ -87,9 +78,6 @@ namespace CpuSchedulingWinForms
                     case "priority":
                         priorityTextBoxes.Add(textBox);
                         break;
-                    case "quantum":
-                        quantumTimeTextBox = textBox;
-                        break;
                 }
         }
 
@@ -99,35 +87,19 @@ namespace CpuSchedulingWinForms
 
             String selectedType = (String) this.Tag;
             List<ProcessControlBlock> pcbs = new List<ProcessControlBlock>();
-            Int32 quantumTime = quantumTimeTextBox != null ? Convert.ToInt32(quantumTimeTextBox.Text) : -1;
 
             // Read values from dynamically created textboxes
             for(int index = 0; index < burstTimeTextBoxes.Count; index++){
-                ProcessControlBlock pcb = new ProcessControlBlock();
 
-                pcb.BurstTime = (index < burstTimeTextBoxes.Count) ? Convert.ToInt32(burstTimeTextBoxes.ElementAt(index).Text) : -1;
-                pcb.ArrivalTime = (index < arrivalTimeTextBoxes.Count) ? Convert.ToInt32(arrivalTimeTextBoxes.ElementAt(index).Text) : -1;
-                pcb.Priority = (index < priorityTextBoxes.Count) ? Convert.ToInt32(priorityTextBoxes.ElementAt(index).Text) : -1;
+                int burstTime = (index < burstTimeTextBoxes.Count) ? Convert.ToInt32(burstTimeTextBoxes.ElementAt(index).Text) : -1;
+                int arrivalTime = (index < arrivalTimeTextBoxes.Count) ? Convert.ToInt32(arrivalTimeTextBoxes.ElementAt(index).Text) : -1;
+                int priority = (index < priorityTextBoxes.Count) ? Convert.ToInt32(priorityTextBoxes.ElementAt(index).Text) : -1;
 
+                ProcessControlBlock pcb = new ProcessControlBlock(index, burstTime, arrivalTime, priority);
                 pcbs.Add(pcb);
             }
 
-            // Run selected algorithm
-            switch(selectedType){
-                case "FCFS":
-                    Algorithms.fcfsAlgorithm(pcbs);
-                    break;
-                case "SJF":
-                    Algorithms.sjfAlgorithm(pcbs);
-                    break;
-                case "PRIORITY":
-                    Algorithms.priorityAlgorithm(pcbs);
-                    break;
-                case "RR":
-                    Algorithms.roundRobinAlgorithm(pcbs, quantumTime);
-                    break;
-            }
-
+            Algorithms.runAlgorithm(pcbs, selectedType);
         }
     }
 }

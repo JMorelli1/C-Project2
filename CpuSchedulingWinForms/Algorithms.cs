@@ -258,8 +258,6 @@ namespace CpuSchedulingWinForms
             resultsForm.ShowDialog();
         }
 
-
-
         public static void srtfAlgorithm(List<ProcessControlBlock> pcbs){
             int time = 0;
             int completed = 0;
@@ -338,10 +336,10 @@ namespace CpuSchedulingWinForms
 
                 completed++;
             }
-            
+
             // --- Launch Results Display ---
-                ResultsDisplay resultsForm = new ResultsDisplay(pcbs);
-                resultsForm.ShowDialog();
+            ResultsDisplay resultsForm = new ResultsDisplay(pcbs);
+            resultsForm.ShowDialog();
         }
 
         public static void runAlgorithm(List<ProcessControlBlock> pcbs, string selectedType){

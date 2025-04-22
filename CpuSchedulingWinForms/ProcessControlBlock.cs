@@ -3,7 +3,7 @@ public class ProcessControlBlock
     public int ID { get; set; }
     public int ArrivalTime { get; set; }
     public int BurstTime { get; set; }
-    public int Priority { get; set; } = -1; // -1 if unused
+    public int Priority { get; set; } = -1;
     public int RemainingTime { get; set; }
     public int StartTime { get; set; } = -1;
     public int CompletionTime { get; set; } = -1;
