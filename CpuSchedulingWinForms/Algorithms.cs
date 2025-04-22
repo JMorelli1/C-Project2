@@ -11,30 +11,33 @@ namespace CpuSchedulingWinForms
         public static void fcfsAlgorithm(List<ProcessControlBlock> pcbs)
         {
             var np = pcbs.Count;
-
-            double[] wtp = new double[np];
-            double twt = 0.0, awt; 
             int num;
-            List<long> burstTimes = pcbs.Select(pcb => (long)pcb.BurstTime).ToList();
-
-                for (num = 0; num <= np - 1; num++)
-                {
+            pcbs.Sort((a, b) => a.ArrivalTime.CompareTo(b.ArrivalTime));
+ 
+                for (num = 0; num <= np - 1; num++){
+                    
+                    ProcessControlBlock pcb = pcbs[num];
                     if (num == 0)
                     {
-                        wtp[num] = 0;
+                        pcb.StartTime = 0;
+                        pcb.CompletionTime = pcb.BurstTime;
                     }
                     else
-                    {
-                        wtp[num] = wtp[num - 1] + burstTimes[num - 1];
-                        MessageBox.Show("Waiting time for P" + (num + 1) + " = " + wtp[num], "Job Queue", MessageBoxButtons.OK, MessageBoxIcon.None);
+                    {   
+                        ProcessControlBlock prevPCB = pcbs[num-1];
+                        if(prevPCB.CompletionTime < pcb.ArrivalTime){
+                            pcb.StartTime = pcb.ArrivalTime;
+                        }
+                        else{
+                            pcb.StartTime = prevPCB.CompletionTime; 
+                        } 
+                        pcb.CompletionTime = pcb.StartTime + pcb.BurstTime;
                     }
                 }
-                for (num = 0; num <= np - 1; num++)
-                {
-                    twt = twt + wtp[num];
-                }
-                awt = twt / np;
-                MessageBox.Show("Average waiting time for " + np + " processes" + " = " + awt + " sec(s)", "Average Awaiting Time", MessageBoxButtons.OK, MessageBoxIcon.None);
+
+                // --- Launch Results Display ---
+                ResultsDisplay resultsForm = new ResultsDisplay(pcbs);
+                resultsForm.ShowDialog();
         }
 
         public static void sjfAlgorithm(List<ProcessControlBlock> pcbs){
@@ -50,7 +53,7 @@ namespace CpuSchedulingWinForms
             List<long> burstTimes = pcbs.Select(pcb => (long)pcb.BurstTime).ToList();
             for (num = 0; num <= np - 1; num++)
             {
-                p[num] = burstTimes[num];
+                p[num] = burstTimes[num]; // Creates a secondary list of burstTimes
             }
             for (x = 0; x <= np - 2; x++)
             {
@@ -71,7 +74,7 @@ namespace CpuSchedulingWinForms
                     for (x = 0; x <= np - 1; x++)
                     {
                         if (p[num] == burstTimes[x] && found == false)
-                        {
+                        {   
                             wtp[num] = 0;
                             MessageBox.Show("Waiting time for P" + (x + 1) + " = " + wtp[num], "Waiting time:", MessageBoxButtons.OK, MessageBoxIcon.None);
                             //Console.WriteLine("\nWaiting time for P" + (x + 1) + " = " + wtp[num]);
@@ -260,9 +263,8 @@ namespace CpuSchedulingWinForms
         public static void srtfAlgorithm(List<ProcessControlBlock> pcbs){
             int time = 0;
             int completed = 0;
-            int n = pcbs.Count;
 
-            while (completed < n){
+            while (completed < pcbs.Count){
                 // Get processes that have arrived and are not completed
                 var available = pcbs
                     .Where(p => p.ArrivalTime <= time && p.RemainingTime > 0)
@@ -273,6 +275,7 @@ namespace CpuSchedulingWinForms
                 if (available.Any()){
                     var current = available.First();
 
+                    // Set start time if not already done
                     if (current.StartTime == -1)
                         current.StartTime = time;
 
@@ -287,10 +290,11 @@ namespace CpuSchedulingWinForms
                     }
                 }
                 else{
-                    // Idle time (no available processes)
+                    // CPU Idle 
                     time++;
                 }
             }
+            
             // --- Launch Results Display ---
             ResultsDisplay resultsForm = new ResultsDisplay(pcbs);
             resultsForm.ShowDialog();
@@ -299,20 +303,19 @@ namespace CpuSchedulingWinForms
         public static void hrrnAlgorithm(List<ProcessControlBlock> pcbs){
             int time = 0;
             int completed = 0;
-            int n = pcbs.Count;
 
             var remaining = new List<ProcessControlBlock>(pcbs);
 
-            while (completed < n)
+            while (completed < pcbs.Count)
             {
                 // Get processes that have arrived but not completed
                 var available = remaining
                     .Where(p => p.ArrivalTime <= time && p.CompletionTime == -1)
                     .ToList();
 
-                if (available.Count == 0)
+                if (!available.Any())
                 {
-                    // Idle time — no process has arrived yet
+                    // Idle, no process has arrived yet
                     time++;
                     continue;
                 }
@@ -335,6 +338,7 @@ namespace CpuSchedulingWinForms
 
                 completed++;
             }
+            
             // --- Launch Results Display ---
                 ResultsDisplay resultsForm = new ResultsDisplay(pcbs);
                 resultsForm.ShowDialog();

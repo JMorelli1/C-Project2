@@ -76,7 +76,6 @@ namespace CpuSchedulingWinForms
                 textBox.Width = 200;
                 textBox.Tag = tag;
                 this.Controls.Add(textBox);
-                burstTimeTextBoxes.Add(textBox);
 
                 switch(tag){
                     case "burst":
@@ -100,18 +99,17 @@ namespace CpuSchedulingWinForms
 
             String selectedType = (String) this.Tag;
             List<ProcessControlBlock> pcbs = new List<ProcessControlBlock>();
-            List<Int64> burstTimes = new List<Int64>();
-            List<Int64> arrivalTimes = new List<Int64>();
-            List<Int64> priorities = new List<Int64>();
             Int32 quantumTime = quantumTimeTextBox != null ? Convert.ToInt32(quantumTimeTextBox.Text) : -1;
 
             // Read values from dynamically created textboxes
             for(int index = 0; index < burstTimeTextBoxes.Count; index++){
                 ProcessControlBlock pcb = new ProcessControlBlock();
 
-                pcb.BurstTime = (index < burstTimeTextBoxes.Count) ? Convert.ToInt32(burstTimeTextBoxes.ElementAt(index)) : -1;
-                pcb.ArrivalTime = (index < burstTimeTextBoxes.Count) ? Convert.ToInt32(arrivalTimeTextBoxes.ElementAt(index)) : -1;
-                pcb.Priority = (index < burstTimeTextBoxes.Count) ? Convert.ToInt32(priorityTextBoxes.ElementAt(index)) : -1;
+                pcb.BurstTime = (index < burstTimeTextBoxes.Count) ? Convert.ToInt32(burstTimeTextBoxes.ElementAt(index).Text) : -1;
+                pcb.ArrivalTime = (index < arrivalTimeTextBoxes.Count) ? Convert.ToInt32(arrivalTimeTextBoxes.ElementAt(index).Text) : -1;
+                pcb.Priority = (index < priorityTextBoxes.Count) ? Convert.ToInt32(priorityTextBoxes.ElementAt(index).Text) : -1;
+
+                pcbs.Add(pcb);
             }
 
             // Run selected algorithm

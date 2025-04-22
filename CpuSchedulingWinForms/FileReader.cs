@@ -8,6 +8,7 @@ public class FileReader
     {
         var pcbList = new List<ProcessControlBlock>();
 
+        Console.WriteLine(filePath);
         if (!File.Exists(filePath))
         {
             throw new FileNotFoundException("CSV file not found.", filePath);

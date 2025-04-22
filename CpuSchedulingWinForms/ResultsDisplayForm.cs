@@ -10,7 +10,7 @@ using ScottPlot.TickGenerators;
 public class ResultsDisplay : Form
 {
     private DataGridView dataGrid;
-    private System.Windows.Forms.Label averageLabel;
+    private System.Windows.Forms.Label metricsLabel;
     private ScottPlot.WinForms.FormsPlot turnaroundTimePlot;
     private ScottPlot.WinForms.FormsPlot waitTimePlot;
 
@@ -35,16 +35,17 @@ public class ResultsDisplay : Form
             Left = 10,
             ReadOnly = true,
             AllowUserToAddRows = false,
-            ColumnCount = 7
+            ColumnCount = 8
         };
 
         dataGrid.Columns[0].Name = "Process ID";
         dataGrid.Columns[1].Name = "Burst Time";
         dataGrid.Columns[2].Name = "Arrival Time";
         dataGrid.Columns[3].Name = "Priority";
-        dataGrid.Columns[4].Name = "Completion Time";
-        dataGrid.Columns[5].Name = "Turnaround Time";
-        dataGrid.Columns[6].Name = "Waiting Time";
+        dataGrid.Columns[4].Name = "Response Time";
+        dataGrid.Columns[5].Name = "Completion Time";
+        dataGrid.Columns[6].Name = "Turnaround Time";
+        dataGrid.Columns[7].Name = "Waiting Time";
 
         this.Controls.Add(dataGrid);
     }
@@ -78,7 +79,7 @@ public class ResultsDisplay : Form
         var turnaroundValues = new List<double>();
         var waitValues = new List<double>();
         var labels = new List<string>();
-        var cpuUtilization = CalculateCpuUtilization(pcbs);
+        Metrics calculatedMetrics = CalculateMetrics(pcbs);
 
         foreach (var pcb in pcbs)
         {
@@ -87,6 +88,7 @@ public class ResultsDisplay : Form
                 pcb.BurstTime,
                 pcb.ArrivalTime,
                 pcb.Priority,
+                pcb.ResponseTime,
                 pcb.CompletionTime,
                 pcb.TurnaroundTime,
                 pcb.WaitingTime
@@ -106,14 +108,14 @@ public class ResultsDisplay : Form
         double avgWT = totalWT / count;
         double avgCT = totalCT / count;
 
-        averageLabel = new System.Windows.Forms.Label
+        metricsLabel = new System.Windows.Forms.Label
         {
-            Text = $"Average Completion Time: {avgCT} | Average Turnaround Time: {avgTAT} | Average Waiting Time: {Math.Round(avgWT, 2)} | CPU Utilization: {Math.Round(cpuUtilization, 2)}%",
+            Text = $"Average Completion Time: {avgCT} | Average Turnaround Time: {avgTAT} | Average Waiting Time: {Math.Round(avgWT, 2)} | CPU Utilization: {Math.Round(calculatedMetrics.Utilization, 2)}% | Throughput: {Math.Round(calculatedMetrics.Throughput, 2)} process per time unit | Response Time: ",
             Top = 810,
             Left = 10,
             Width = 860
         };
-        this.Controls.Add(averageLabel);
+        this.Controls.Add(metricsLabel);
 
         // --- ScottPlot v5 Bar Chart Setup ---
 
@@ -174,18 +176,32 @@ public class ResultsDisplay : Form
         waitTimePlot.Refresh();
     }
 
-    private static double CalculateCpuUtilization(List<ProcessControlBlock> pcbs)
+    public class Metrics{
+        public double Utilization{ get; } = -1;
+        public double Throughput{ get; } = -1;
+
+        public Metrics(double utilization, double throughput){
+            Utilization = utilization;
+            Throughput = throughput;
+        }
+
+    }
+
+public static Metrics CalculateMetrics(List<ProcessControlBlock> pcbs)
 {
     if (pcbs == null || pcbs.Count == 0)
-        return 0;
+        return new Metrics(0, 0);
 
     double totalBusyTime = pcbs.Sum(p => p.BurstTime);
+    int completedProcesses = pcbs.Count;
     int totalTime = pcbs.Max(p => p.CompletionTime);
 
     if (totalTime == 0)
-        return 0;
+        return new Metrics(0, 0);
 
-    double utilization = (totalBusyTime / totalTime) * 100.0;
-    return utilization;
+    double utilization = totalBusyTime / totalTime * 100.0;
+    double throughput = (double)completedProcesses / totalTime;
+
+    return new Metrics(utilization, throughput);
 }
 }

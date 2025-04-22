@@ -54,8 +54,9 @@ namespace CpuSchedulingWinForms
             Control clickedButton = (Button)sender; 
             List<ProcessControlBlock> pcbs = null;
             string selectedFile = fileSelector.SelectedItem?.ToString();
+            Console.WriteLine($"FILE {selectedFile}");
 
-            if(selectedFile != ""){
+            if(!string.IsNullOrEmpty(selectedFile)){
                 pcbs = FileReader.LoadProcessesFromCsv($"data/{selectedFile}");
                 Algorithms.runAlgorithm(pcbs, (string) clickedButton.Tag);
                 updateProcessState(pcbs.Count);
