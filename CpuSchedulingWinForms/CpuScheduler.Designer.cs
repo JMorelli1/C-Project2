@@ -30,6 +30,7 @@
         {
             this.components = new System.ComponentModel.Container();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(CpuScheduler));
+            this.fileSelector = new System.Windows.Forms.ComboBox();
             this.panel1 = new System.Windows.Forms.Panel();
             this.sidePanel = new System.Windows.Forms.Panel();
             this.btnProductCode = new System.Windows.Forms.Button();
@@ -39,6 +40,8 @@
             this.btnDashBoard = new System.Windows.Forms.Button();
             this.tabSelection = new System.Windows.Forms.TabControl();
             this.dashBoardTab = new System.Windows.Forms.TabPage();
+            this.btnSRTF = new System.Windows.Forms.Button();
+            this.btnHRRN = new System.Windows.Forms.Button();
             this.listView1 = new System.Windows.Forms.ListView();
             this.progressBar2 = new System.Windows.Forms.ProgressBar();
             this.label3 = new System.Windows.Forms.Label();
@@ -56,6 +59,7 @@
             this.btnFCFS = new System.Windows.Forms.Button();
             this.txtProcess = new System.Windows.Forms.TextBox();
             this.labelProcess = new System.Windows.Forms.Label();
+            this.fileSelectorLabel = new System.Windows.Forms.Label();
             this.productTab = new System.Windows.Forms.TabPage();
             this.btnSave = new System.Windows.Forms.Button();
             this.btnQrcode = new System.Windows.Forms.Button();
@@ -74,6 +78,24 @@
             this.productTab.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBoxCodeOutput)).BeginInit();
             this.SuspendLayout();
+
+            // 
+            // fileSelector
+            // 
+            this.fileSelector.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.fileSelector.FormattingEnabled = true;
+            this.fileSelector.Location = new System.Drawing.Point(205, 43);
+            this.fileSelector.Name = "fileDropdown";
+            this.fileSelector.Size = new System.Drawing.Size(249, 33);
+            // 
+            // fileSelectorLabel
+            // 
+            this.fileSelectorLabel.AutoSize = true;
+            this.fileSelectorLabel.Location = new System.Drawing.Point(29, 43);
+            this.fileSelectorLabel.Name = "dataSets";
+            this.fileSelectorLabel.Size = new System.Drawing.Size(148, 15);
+            this.fileSelectorLabel.TabIndex = 6;
+            this.fileSelectorLabel.Text = "Data Sets:";
             // 
             // panel1
             // 
@@ -313,6 +335,10 @@
             this.cpuSchedulerTab.BackColor = System.Drawing.SystemColors.InactiveBorder;
             this.cpuSchedulerTab.BackgroundImage = ((System.Drawing.Image)(resources.GetObject("cpuSchedulerTab.BackgroundImage")));
             this.cpuSchedulerTab.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Center;
+            this.cpuSchedulerTab.Controls.Add(this.btnSRTF);
+            this.cpuSchedulerTab.Controls.Add(this.btnHRRN);
+            this.cpuSchedulerTab.Controls.Add(this.fileSelectorLabel);
+            this.cpuSchedulerTab.Controls.Add(this.fileSelector);
             this.cpuSchedulerTab.Controls.Add(this.btnRoundRobin);
             this.cpuSchedulerTab.Controls.Add(this.restartApp);
             this.cpuSchedulerTab.Controls.Add(this.btnPriority);
@@ -327,6 +353,43 @@
             this.cpuSchedulerTab.Size = new System.Drawing.Size(501, 413);
             this.cpuSchedulerTab.TabIndex = 1;
             this.cpuSchedulerTab.Text = "CPU Scheduler";
+            //
+            // btnHRRN
+            //
+            this.btnHRRN.BackColor = System.Drawing.Color.PapayaWhip;
+            this.btnHRRN.Cursor = System.Windows.Forms.Cursors.Hand;
+            this.btnHRRN.FlatAppearance.MouseOverBackColor = System.Drawing.Color.PaleGreen;
+            this.btnHRRN.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.btnHRRN.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.btnHRRN.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            this.btnHRRN.Location = new System.Drawing.Point(190, 338);
+            this.btnHRRN.Name = "btnHRRN";
+            this.btnHRRN.Size = new System.Drawing.Size(160, 45);
+            this.btnHRRN.TabIndex = 12;
+            this.btnHRRN.Text = "HIGHEST RESPONSE RATIO NEXT";
+            this.btnHRRN.Tag = "HRRN";
+            this.btnHRRN.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            this.btnHRRN.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageBeforeText;
+            this.btnHRRN.UseVisualStyleBackColor = false;
+            this.btnHRRN.Click += new System.EventHandler(this.processAlgorithmRun);
+            //
+            // btnSRJF
+            //
+            this.btnSRTF.BackColor = System.Drawing.Color.PapayaWhip;
+            this.btnSRTF.Cursor = System.Windows.Forms.Cursors.Hand;
+            this.btnSRTF.FlatAppearance.MouseOverBackColor = System.Drawing.Color.PaleGreen;
+            this.btnSRTF.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.btnSRTF.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.btnSRTF.Location = new System.Drawing.Point(16, 338);
+            this.btnSRTF.Name = "btnSRTF";
+            this.btnSRTF.Size = new System.Drawing.Size(160, 45);
+            this.btnSRTF.TabIndex = 12;
+            this.btnSRTF.Text = "SHORTEST REMAINING TIME FIRST";
+            this.btnSRTF.Tag = "SRTF";
+            this.btnSRTF.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            this.btnSRTF.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageBeforeText;
+            this.btnSRTF.UseVisualStyleBackColor = false;
+            this.btnSRTF.Click += new System.EventHandler(this.processAlgorithmRun);
             // 
             // btnRoundRobin
             // 
@@ -342,10 +405,11 @@
             this.btnRoundRobin.Size = new System.Drawing.Size(85, 45);
             this.btnRoundRobin.TabIndex = 12;
             this.btnRoundRobin.Text = "Round\r\nRobin";
+            this.btnRoundRobin.Tag = "RR";
             this.btnRoundRobin.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
             this.btnRoundRobin.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageBeforeText;
             this.btnRoundRobin.UseVisualStyleBackColor = false;
-            this.btnRoundRobin.Click += new System.EventHandler(this.btnRoundRobin_Click);
+            this.btnRoundRobin.Click += new System.EventHandler(this.processAlgorithmRun);
             // 
             // restartApp
             // 
@@ -374,10 +438,11 @@
             this.btnPriority.Size = new System.Drawing.Size(107, 45);
             this.btnPriority.TabIndex = 10;
             this.btnPriority.Text = "PRIORITY";
+            this.btnPriority.Tag = "PRIORITY";
             this.btnPriority.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
             this.btnPriority.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageBeforeText;
             this.btnPriority.UseVisualStyleBackColor = false;
-            this.btnPriority.Click += new System.EventHandler(this.btnPriority_Click);
+            this.btnPriority.Click += new System.EventHandler(this.processAlgorithmRun);
             // 
             // btnSJF
             // 
@@ -393,10 +458,11 @@
             this.btnSJF.Size = new System.Drawing.Size(117, 45);
             this.btnSJF.TabIndex = 9;
             this.btnSJF.Text = "SHORTEST JOB FIRST";
+            this.btnSJF.Tag = "SJF";
             this.btnSJF.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
             this.btnSJF.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageBeforeText;
             this.btnSJF.UseVisualStyleBackColor = false;
-            this.btnSJF.Click += new System.EventHandler(this.btnSJF_Click);
+            this.btnSJF.Click += new System.EventHandler(this.processAlgorithmRun);
             // 
             // btnFCFS
             // 
@@ -412,10 +478,11 @@
             this.btnFCFS.Size = new System.Drawing.Size(84, 45);
             this.btnFCFS.TabIndex = 8;
             this.btnFCFS.Text = "FCFS";
+            this.btnFCFS.Tag = "FCFS";
             this.btnFCFS.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
             this.btnFCFS.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageBeforeText;
             this.btnFCFS.UseVisualStyleBackColor = false;
-            this.btnFCFS.Click += new System.EventHandler(this.btnFCFS_Click);
+            this.btnFCFS.Click += new System.EventHandler(this.processAlgorithmRun);
             // 
             // txtProcess
             // 
@@ -554,6 +621,7 @@
 
         #endregion
 
+        private System.Windows.Forms.ComboBox fileSelector;
         private System.Windows.Forms.Panel panel1;
         private System.Windows.Forms.Button btnCpuScheduler;
         private System.Windows.Forms.Button btnDashBoard;
@@ -571,7 +639,10 @@
         private System.Windows.Forms.Button btnFCFS;
         public System.Windows.Forms.TextBox txtProcess;
         private System.Windows.Forms.Label labelProcess;
+        private System.Windows.Forms.Label fileSelectorLabel;
         private System.Windows.Forms.Button btnQrcode;
+        private System.Windows.Forms.Button btnSRTF;
+        private System.Windows.Forms.Button btnHRRN;
         private System.Windows.Forms.TextBox txtCodeInput;
         private System.Windows.Forms.PictureBox pictureBoxCodeOutput;
         private System.Windows.Forms.Button btnBarcode;

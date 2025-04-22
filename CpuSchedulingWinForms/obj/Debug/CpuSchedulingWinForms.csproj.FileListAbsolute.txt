@@ -62,3 +62,6 @@ E:\Development Projects\.Net Projects\CpuSchedulingWinForms\CpuSchedulingWinForm
 E:\Development Projects\.Net Projects\CpuSchedulingWinForms\CpuSchedulingWinForms\obj\Debug\CpuSchedulingWinForms.csproj.CopyComplete
 E:\Development Projects\.Net Projects\CpuSchedulingWinForms\CpuSchedulingWinForms\obj\Debug\CpuSchedulingWinForms.exe
 E:\Development Projects\.Net Projects\CpuSchedulingWinForms\CpuSchedulingWinForms\obj\Debug\CpuSchedulingWinForms.pdb
+C:\Users\morel\Desktop\OS Project\CPU-Simulator-GUI\CpuSchedulingWinForms\obj\Debug\CpuSchedulingWinForms.exe
+C:\Users\morel\Desktop\OS Project\CPU-Simulator-GUI\CpuSchedulingWinForms\obj\Debug\CpuSchedulingWinForms.pdb
+C:\Users\morel\Desktop\OS Project\CPU-Simulator-GUI\CpuSchedulingWinForms\obj\Debug\CpuSchedulingWinForms.csproj.AssemblyReference.cache
