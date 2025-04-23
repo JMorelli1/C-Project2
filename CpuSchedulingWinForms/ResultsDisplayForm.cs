@@ -1,11 +1,8 @@
 using System;
 using System.Collections.Generic;
-using System.Drawing;
 using System.Linq;
 using System.Windows.Forms;
 using ScottPlot;
-using ScottPlot.Plottables;
-using ScottPlot.TickGenerators;
 
 public class ResultsDisplay : Form
 {
@@ -17,8 +14,8 @@ public class ResultsDisplay : Form
     public ResultsDisplay(List<ProcessControlBlock> pcbList)
     {
         this.Text = "Scheduling Results";
-        this.Width = 900;
-        this.Height = 1000;
+        this.Width = 1050;
+        this.Height = 800;
 
         InitializeGrid();
         InitializePlot();
@@ -29,7 +26,7 @@ public class ResultsDisplay : Form
     {
         dataGrid = new DataGridView
         {
-            Width = 860,
+            Width = 1000,
             Height = 250,
             Top = 10,
             Left = 10,
@@ -54,17 +51,17 @@ public class ResultsDisplay : Form
     {
         turnaroundTimePlot = new ScottPlot.WinForms.FormsPlot
         {
-            Width = 660,
+            Width = 1000,
             Height = 200,
-            Top = 270,
+            Top = 300,
             Left = 10
         };
 
         waitTimePlot = new ScottPlot.WinForms.FormsPlot
         {
-            Width = 660,
+            Width = 1000,
             Height = 200,
-            Top = 540,
+            Top = 500,
             Left = 10
         };
 
@@ -111,7 +108,7 @@ public class ResultsDisplay : Form
         metricsLabel = new System.Windows.Forms.Label
         {
             Text = $"Average Completion Time: {avgCT} | Average Turnaround Time: {avgTAT} | Average Waiting Time: {Math.Round(avgWT, 2)} | CPU Utilization: {Math.Round(calculatedMetrics.Utilization, 2)}% | Throughput: {Math.Round(calculatedMetrics.Throughput, 2)} process per time unit | Response Time: ",
-            Top = 810,
+            Top = 270,
             Left = 10,
             Width = 860
         };

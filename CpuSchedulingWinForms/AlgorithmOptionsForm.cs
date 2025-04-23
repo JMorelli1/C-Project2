@@ -95,7 +95,7 @@ namespace CpuSchedulingWinForms
                 int arrivalTime = (index < arrivalTimeTextBoxes.Count) ? Convert.ToInt32(arrivalTimeTextBoxes.ElementAt(index).Text) : -1;
                 int priority = (index < priorityTextBoxes.Count) ? Convert.ToInt32(priorityTextBoxes.ElementAt(index).Text) : -1;
 
-                ProcessControlBlock pcb = new ProcessControlBlock(index, burstTime, arrivalTime, priority);
+                ProcessControlBlock pcb = new ProcessControlBlock(index, arrivalTime, burstTime, priority);
                 pcbs.Add(pcb);
             }
 

@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("CpuSchedulingWinForms")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+7e2478802ad31e5e71ff0734df1b202a2017660d")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+4e7631d78d9bd3f3dc86639baa67794fa8f01abe")]
 [assembly: System.Reflection.AssemblyProductAttribute("CpuSchedulingWinForms")]
 [assembly: System.Reflection.AssemblyTitleAttribute("CpuSchedulingWinForms")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

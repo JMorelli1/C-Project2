@@ -66,6 +66,7 @@
             this.txtCodeInput = new System.Windows.Forms.TextBox();
             this.pictureBoxCodeOutput = new System.Windows.Forms.PictureBox();
             this.btnBarcode = new System.Windows.Forms.Button();
+            this.btnCompare = new System.Windows.Forms.Button();
             this.timer1 = new System.Windows.Forms.Timer(this.components);
             this.panel1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
@@ -346,6 +347,7 @@
             this.cpuSchedulerTab.Controls.Add(this.btnFCFS);
             this.cpuSchedulerTab.Controls.Add(this.txtProcess);
             this.cpuSchedulerTab.Controls.Add(this.labelProcess);
+            this.cpuSchedulerTab.Controls.Add(this.btnCompare);
             this.cpuSchedulerTab.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, ((System.Drawing.FontStyle)((System.Drawing.FontStyle.Bold | System.Drawing.FontStyle.Underline))), System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.cpuSchedulerTab.Location = new System.Drawing.Point(4, 22);
             this.cpuSchedulerTab.Name = "cpuSchedulerTab";
@@ -584,6 +586,23 @@
             this.btnBarcode.UseVisualStyleBackColor = false;
             this.btnBarcode.Click += new System.EventHandler(this.btnBarcode_Click);
             // 
+            // btnCompare
+            // 
+            this.btnCompare.BackColor = System.Drawing.Color.Tan;
+            this.btnCompare.Cursor = System.Windows.Forms.Cursors.Hand;
+            this.btnCompare.FlatAppearance.BorderColor = System.Drawing.SystemColors.InactiveBorder;
+            this.btnCompare.FlatAppearance.MouseOverBackColor = System.Drawing.Color.PaleGreen;
+            this.btnCompare.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.btnCompare.Font = new System.Drawing.Font("Segoe UI", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.btnCompare.ForeColor = System.Drawing.SystemColors.ControlText;
+            this.btnCompare.Location = new System.Drawing.Point(16, 120);
+            this.btnCompare.Name = "btnCompare";
+            this.btnCompare.Size = new System.Drawing.Size(122, 36);
+            this.btnCompare.TabIndex = 3;
+            this.btnCompare.Text = "Compare Algorithms";
+            this.btnCompare.UseVisualStyleBackColor = false;
+            this.btnCompare.Click += new System.EventHandler(this.compareAlgorithms);
+            // 
             // timer1
             // 
             this.timer1.Tick += new System.EventHandler(this.timer1_Tick);
@@ -658,5 +677,6 @@
         private System.Windows.Forms.Button btnRoundRobin;
         private System.Windows.Forms.ListView listView1;
         private System.Windows.Forms.Timer timer1;
+        private System.Windows.Forms.Button btnCompare;
     }
 }

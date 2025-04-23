@@ -46,6 +46,31 @@ namespace CpuSchedulingWinForms
             //this.btnCpuScheduler.BackColor = Color.DimGray;
         }
 
+        private void compareAlgorithms(object sender, EventArgs e){
+            if(sender is not Button){
+                throw new Exception("Unknown selection made for Algorithm run.");
+            }
+
+            Control clickedButton = (Button)sender; 
+            List<ProcessControlBlock> pcbs = null;
+            string selectedFile = fileSelector.SelectedItem?.ToString();
+
+            if(!string.IsNullOrEmpty(selectedFile)){
+                List<AlgorithmResults> results;
+                pcbs = FileReader.LoadProcessesFromCsv($"data/{selectedFile}");
+
+                try{
+                    results = Algorithms.runAlgorithms(pcbs, (string) clickedButton.Tag);
+                    CompareDisplay display = new CompareDisplay(results);
+                    display.Show(); 
+                }
+                catch(Exception err){
+                    MessageBox.Show(err.Message, err.Source, MessageBoxButtons.OK, MessageBoxIcon.None);
+                    return;
+                }
+            }
+        }
+
         private void processAlgorithmRun (object sender, EventArgs e){
             if(sender is not Button){
                 throw new Exception("Unknown selection made for Algorithm run.");
@@ -73,6 +98,9 @@ namespace CpuSchedulingWinForms
                 MessageBox.Show("Enter number of processes or select a stored file", "", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 txtProcess.Focus();
             }
+
+            ResultsDisplay display = new ResultsDisplay(pcbs);
+            display.Show(); 
         }
 
         private void updateProcessState(int numberOfProcess) {
