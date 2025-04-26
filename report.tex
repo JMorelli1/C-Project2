@@ -119,7 +119,7 @@ This algorithm is a preemptive model that evaluates each available process for t
         .ToList();
 \end{lstlisting}
 
-Here we use a stream to first filter the process that have either not yet arrived or are already complete. Then we sort the list first be remaining time then by arrival time to get all available PCBs in the proper order. If no processes are found in this loop it increments the time by one second to act as CPU idle time.
+Here we use a stream to first filter the process that have either not yet arrived or are already complete. Then we sort the list first by remaining time then by arrival time to get all available PCBs in the proper order. If no processes are found in this loop it increments the time by one second to act as CPU idle time.
 
 \hfill
 \begin{lstlisting}[caption={SRTF Increment Time}, label=code:srtf-2]
@@ -148,10 +148,10 @@ Throughout this process, it also records the completion time for each process.
 This is a non preemptive algorithm that calculates the response ratio of each process which is used to determine the order of the processes. The response ratio is calculated as seen below.
 
 \[
-RR = \frac{\text{Waiting Time} + \text{Service Time}}{\text{Service Time}}
+Response Ratio = \frac{\text{Waiting Time} + \text{Burst Time}}{\text{Burst Time}}
 \]
 
-As with the SRTF algorithm, in this algorithm the available processes in the list must be found first. Since this algorithm is non preemptive we don't need to check the remaining time instead we can look for a completion time as it is assumed the process will run for its full burst time one it is selected to be executed.
+As with the SRTF algorithm, in this algorithm the available processes in the list must be found first. Since this algorithm is non preemptive we don't need to check the remaining time instead we can look for a completion time as it is assumed the process will run for its full burst time once it is selected to be executed.
 
 \hfill
 \begin{lstlisting}[caption={HRRN Finding Available Processes}, label=code:hrrn-1]
@@ -160,7 +160,7 @@ As with the SRTF algorithm, in this algorithm the available processes in the lis
         .ToList();
 \end{lstlisting}
 
-For each processe its response ratio is calculated and then used to order the list of PCBs. The highest response ratio is pulled and the corresponding process is returned.
+For each process its response ratio is calculated and then used to order the list of PCBs. The highest response ratio is pulled and the corresponding process is returned.
 
 \hfill
 \begin{lstlisting}[caption={HRRN Calculate Response Ratio and Selected Highest}, label=code:hrrn-2]
@@ -185,18 +185,18 @@ Finally we can set the process's start time as the current time and then increme
 \end{lstlisting}
 
 \chapter{Testing and Results}
-This chapter will cover the testing results of all algorithms across several scenarios. It will evaluated the algorithms on the following metrics.
+This chapter will cover the testing results of all algorithms across several scenarios. It will evaluate the algorithms on the following metrics.
 
 \section*{Key CPU Scheduling Metrics}
 
-\subsection*{Average Waiting Time (AWT)}
+\subsection*{Average Waiting Time}
 The average amount of time a process spends waiting in the ready queue before it gets CPU time. Indicates responsiveness in scheduling, higher waiting time indicates long idles.
 
 \[
 \text{AWT} = \frac{\sum \text{Waiting Time of all processes}}{\text{Number of processes}}
 \]
 
-\subsection*{Average Turnaround Time (ATT)}
+\subsection*{Average Turnaround Time}
 The average total time from when a process arrives to when it completes. Shows how long processes typically remain in the system. A lower ATT generally means faster processing across the system.
 
 \[
@@ -215,7 +215,7 @@ The percentage of time the CPU is actively working. A higher utilization means b
 \]
 
 \subsection*{Throughput}
-The number of processes completed per unit time. This is a ratio that demonstrates how quickly tasks are completed through time.
+The number of processes completed per time unit. This is a ratio that demonstrates how quickly tasks are completed through time.
 
 \[
 \text{Throughput} = \frac{\text{Number of Completed Processes}}{\text{Total Time}}
@@ -230,10 +230,10 @@ The time from when a process arrives to when it first starts executing. A strong
 
 \section*{Testing Scenarios}
 \begin{itemize}
-    \item \textbf{Heavy Burst} How well the algorithm handles long-running processes.
-    \item \textbf{Mixed Priority} How effectively Priority Scheduling algorithms operate.
-    \item \textbf{Mixed Burst} How well the scheduling algorithm handles different process sizes.
-    \item \textbf{Same Arrival Time} Pure decision-making based on burst time, priority, or order.
+    \item \textbf{Heavy Burst}: How well the algorithm handles long-running processes.
+    \item \textbf{Mixed Priority}: How effectively Priority Scheduling algorithms operate.
+    \item \textbf{Mixed Burst}: How well the scheduling algorithm handles different process sizes.
+    \item \textbf{Same Arrival Time}: Pure decision-making based on burst time, priority, or order.
 \end{itemize}
 
 \section*{Results}
@@ -290,7 +290,7 @@ Processes had varying priority levels to test fairness and the risk of starvatio
 \begin{itemize}
     \item \textbf{HRRN} performed well by accounting for waiting time, reducing starvation.
     \item \textbf{Priority Scheduling} suffered due to static prioritization, causing lower-priority jobs to wait indefinitely.
-    \item \textbf{SJF} and \textbf{SRTF} still showed good results based on burst awareness.
+    \item \textbf{SJF} and \textbf{SRTF} still showed good results.
 \end{itemize}
 
 \subsection*{Same Arrival Time Scenario}
@@ -311,13 +311,13 @@ All processes arrived at time zero, highlighting pure algorithm behavior without
         \hline
             FCFS & Simple, fair by arrival order & Suffers convoy effect, poor under mixed/long jobs \\
         \hline
-            SJF & Excellent average times when burst is known & Not preemptive; long tasks can be delayed \\
+            SJF & Excellent average times & Not preemptive; long tasks can be delayed \\
         \hline
-            Priority & Useful for urgent task handling & Can starve low-priority jobs without aging \\
+            Priority & Useful for urgent task handling & Can starve low-priority jobs \\
         \hline
-            Round Robin (RR) & Fair, responsive in time-sharing systems & Poor turnaround and waiting under heavy load \\
+            Round Robin (RR) & Fair, responsive & Poor turnaround and waiting under heavy load \\
         \hline
-            SRTF & Optimal in turnaround and wait time; preemptive & Needs accurate burst estimation; complex switching \\
+            SRTF & Optimal in turnaround and wait time; preemptive & High overhead, Requires good burst time estimation \\
         \hline
             HRRN & Balances fairness and efficiency; prevents starvation & Slightly more complex to implement \\
         \hline
@@ -345,6 +345,8 @@ Overall, algorithms that took burst time into account — such as SJF, SRTF, and
 Priority Scheduling placed in the middle of the pack. Its performance was likely limited by the use of randomly assigned priorities. With a more thoughtful or workload-aware priority scheme, this algorithm could potentially perform much better.
 
 In summary, the evaluation highlights that awareness of burst time and adaptive prioritization are key factors in achieving better scheduling performance. Simpler algorithms offer fairness and predictability but often fall short in efficiency, especially under mixed workloads.
+
+After completing all testing, I recommend that OwlTech Systems adopt the Shortest Remaining Time First (SRTF) approach if they can reliably estimate burst times. If accurate burst time prediction is not feasible, the Highest Response Ratio Next (HRRN) algorithm provides comparable performance improvements while offering a more balanced approach that is less sensitive to inaccurate estimations.
 \bibliography{myBib}
 
 \end{document}
