@@ -61,7 +61,7 @@ namespace CpuSchedulingWinForms
 
                 try{
                     results = Algorithms.runAlgorithms(pcbs, (string) clickedButton.Tag);
-                    CompareDisplay display = new CompareDisplay(results);
+                    CompareDisplay display = new CompareDisplay(selectedFile, results);
                     display.Show(); 
                 }
                 catch(Exception err){

@@ -375,7 +375,7 @@
             this.btnHRRN.UseVisualStyleBackColor = false;
             this.btnHRRN.Click += new System.EventHandler(this.processAlgorithmRun);
             //
-            // btnSRJF
+            // btnSRTF
             //
             this.btnSRTF.BackColor = System.Drawing.Color.PapayaWhip;
             this.btnSRTF.Cursor = System.Windows.Forms.Cursors.Hand;

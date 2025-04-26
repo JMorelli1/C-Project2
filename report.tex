@@ -1,0 +1,350 @@
+\documentclass[conference]{report}
+\usepackage{graphicx}  % Allows inclusion of images
+\usepackage{listings}  % Code formatting
+\usepackage{xcolor}    % Colors for code highlighting
+\usepackage{hyperref}  % Hyperlinks in the document
+\usepackage{tikz}
+\usepackage{url}
+\usepackage{graphicx}
+\usepackage{amsmath}
+%Includes "References" in the table of contents
+\usepackage[nottoc]{tocbibind}
+\usetikzlibrary{shapes, arrows, positioning}
+
+\lstdefinelanguage{CSharp}{
+  morekeywords={abstract, event, new, struct, as, explicit, null, switch, base, extern, object, this,
+    bool, false, operator, throw, break, finally, out, true, byte, fixed, override, try, case,
+    float, params, typeof, catch, for, private, uint, char, foreach, protected, ulong, checked,
+    goto, public, unchecked, class, if, readonly, unsafe, const, implicit, ref, ushort, continue,
+    in, return, using, decimal, int, sbyte, virtual, default, interface, sealed, volatile, delegate,
+    internal, short, void, do, is, sizeof, while, double, lock, stackalloc, else, long, static, enum,
+    namespace, string},
+  sensitive=true,
+  morecomment=[l]{//},
+  morecomment=[s]{/*}{*/},
+  morestring=[b]",
+}
+
+\lstset{
+  language=CSharp,
+  basicstyle=\ttfamily\small,
+  keywordstyle=\color{blue},
+  commentstyle=\color{gray},
+  stringstyle=\color{red},
+  numbers=left,
+  numberstyle=\tiny,
+  stepnumber=1,
+  numbersep=10pt,
+  tabsize=2,
+  showspaces=false,
+  showstringspaces=false,
+  breaklines=true,
+  breakatwhitespace=true
+}
+
+\nocite{*} % This command ensures that all entries in myBib.bib are included
+
+\bibliographystyle{acm}
+
+\begin{document}
+
+\title{Evaluating  CPU Scheduling Algorithms}
+\author{James Morelli \\ \small NetId: 3502 \\ \small Operating Systems}
+\date{\today}
+
+\maketitle
+\chapter*{Abstract}
+In this project, we will analyze the current CPU scheduling algorithms employed by OwlTech Systems and evaluate them against two new algorithms to see if performance can be improved. The two new algorithms under consideration are Shortest Remaining Time First (SRTF) and Highest Response Ratio Next (HRRN). These algorithms will be compared across a range of metrics, including turnaround time, waiting time, CPU utilization, and others. Our goal is to determine which algorithms perform best across a varied set of test scenarios.
+\tableofcontents
+
+\chapter{Introduction}
+In this section, we will define what CPU scheduling is, explain its purpose, and describe how this project attempts to emulate that process. CPU scheduling is a critical function of an operating system, as it determines the order and duration that each process is allowed to use the CPU, a valuable and limited resource. Scheduling is handled by algorithms that prioritize processes as they arrive, deciding which process should execute next.
+
+This project uses a defined data structure called a Process Control Block (PCB) to represent each process. Each PCB includes a burst time, arrival time, and, if necessary, a priority value. These PCBs are then run through the logical flows of six scheduling algorithms: First Come First Serve (FCFS), Round Robin (RR), Shortest Job First (SJF), Priority Scheduling, Shortest Remaining Time First (SRTF), and Highest Response Ratio Next (HRRN). Throughout this simulation, we track the start time and completion time of each process. This data is then used to compare the speed and efficiency of each scheduling algorithm.
+
+\chapter{Implementation Details}
+This chapter will cover the development steps taken to create the SRTF and HRRN algorithms.
+
+\section*{Data Structures}
+
+\subsection*{Process Control Block}
+This data structure serves as the central component of the application, used to track the current state of each process. It provides a uniform interface for all scheduling algorithms to interact with the key elements of each running process. Its primary features include the arrival time, burst time, and an optional priority, which allow each algorithm to determine when a process can start, how long it will run, and its scheduling priority.
+
+Additionally, start time, remaining time, and completion time are tracking properties that are updated during the execution of the algorithms and are later used for evaluating performance metrics. Finally, turnaround time, waiting time, and response time are calculated for each process — these are standard metrics commonly used to assess and compare the effectiveness of different scheduling algorithms.
+
+\hfill
+\begin{lstlisting}[caption={Process Control Block Definition}]
+    public class ProcessControlBlock
+    {
+        public int ID { get; set; }
+        public int ArrivalTime { get; set; }
+        public int BurstTime { get; set; }
+        public int Priority { get; set; } = -1;
+        public int RemainingTime { get; set; }
+        public int StartTime { get; set; } = -1;
+        public int CompletionTime { get; set; } = -1;
+        public int TurnaroundTime => CompletionTime >= 0 && ArrivalTime >= 0
+            ? CompletionTime - ArrivalTime
+            : -1;
+        public int WaitingTime => TurnaroundTime >= 0 && BurstTime >= 0
+            ? TurnaroundTime - BurstTime
+            : -1;
+        public int ResponseTime => ArrivalTime >= 0 && StartTime >= 0 
+            ? StartTime - ArrivalTime 
+            : -1;
+    
+        public ProcessControlBlock(){
+        
+        }
+    
+        public ProcessControlBlock(int id, int arrivalTime, int burstTime, int priority = -1){
+            ID = id;
+            ArrivalTime = arrivalTime;
+            BurstTime = burstTime;
+            RemainingTime = burstTime;
+            Priority = priority;
+        }
+    }
+\end{lstlisting}
+
+\subsection*{Shortest Remaining Time First}
+This algorithm is a preemptive model that evaluates each available process for the shortest remaining time and will run that process until it is either complete or a shorter process arrives.
+
+\hfill
+\begin{lstlisting}[caption={SRTF Finding Available Processes}, label=code:srtf-1]
+    var available = pcbs
+        .Where(p => p.ArrivalTime <= time && p.RemainingTime > 0)
+        .OrderBy(p => p.RemainingTime)
+        .ThenBy(p => p.ArrivalTime)
+        .ToList();
+\end{lstlisting}
+
+Here we use a stream to first filter the process that have either not yet arrived or are already complete. Then we sort the list first be remaining time then by arrival time to get all available PCBs in the proper order. If no processes are found in this loop it increments the time by one second to act as CPU idle time.
+
+\hfill
+\begin{lstlisting}[caption={SRTF Increment Time}, label=code:srtf-2]
+    // Set start time if not already done
+    if (current.StartTime == -1)
+        current.StartTime = time;
+
+    // Execute 1 unit of time
+    current.RemainingTime--;
+    time++;
+\end{lstlisting}
+
+The algorithm sets the start time for a process upon its first execution and increments the system time by one unit. It then repeatedly filters and sorts the available PCBs, incrementing the time by one second with each step, until all processes have completed execution.
+
+Throughout this process, it also records the completion time for each process.
+
+\hfill
+\begin{lstlisting}[caption={SRTF Set Completed time}, label=code:srtf-3]
+    if (current.RemainingTime == 0){
+        current.CompletionTime = time;
+        completed++;
+    }
+\end{lstlisting}
+
+\subsection*{Highest Response Ratio Next}
+This is a non preemptive algorithm that calculates the response ratio of each process which is used to determine the order of the processes. The response ratio is calculated as seen below.
+
+\[
+RR = \frac{\text{Waiting Time} + \text{Service Time}}{\text{Service Time}}
+\]
+
+As with the SRTF algorithm, in this algorithm the available processes in the list must be found first. Since this algorithm is non preemptive we don't need to check the remaining time instead we can look for a completion time as it is assumed the process will run for its full burst time one it is selected to be executed.
+
+\hfill
+\begin{lstlisting}[caption={HRRN Finding Available Processes}, label=code:hrrn-1]
+    var available = remaining
+        .Where(p => p.ArrivalTime <= time && p.CompletionTime == -1)
+        .ToList();
+\end{lstlisting}
+
+For each processe its response ratio is calculated and then used to order the list of PCBs. The highest response ratio is pulled and the corresponding process is returned.
+
+\hfill
+\begin{lstlisting}[caption={HRRN Calculate Response Ratio and Selected Highest}, label=code:hrrn-2]
+    var selected = available
+        .Select(p => new
+        {
+            Process = p,
+            ResponseRatio = (double)(time - p.ArrivalTime + p.BurstTime) / p.BurstTime
+        })
+        .OrderByDescending(x => x.ResponseRatio)
+        .First()
+        .Process;
+\end{lstlisting}
+
+Finally we can set the process's start time as the current time and then increment by its burst time as the CPU is assumed to give the full processing time to the execution. It's completion time is saved as well for tracking metrics.
+
+\hfill
+\begin{lstlisting}[caption={HRRN Set Start and Completed Time}, label=code:hrrn-3]
+    selected.StartTime = time;
+    time += selected.BurstTime;
+    selected.CompletionTime = time;
+\end{lstlisting}
+
+\chapter{Testing and Results}
+This chapter will cover the testing results of all algorithms across several scenarios. It will evaluated the algorithms on the following metrics.
+
+\section*{Key CPU Scheduling Metrics}
+
+\subsection*{Average Waiting Time (AWT)}
+The average amount of time a process spends waiting in the ready queue before it gets CPU time. Indicates responsiveness in scheduling, higher waiting time indicates long idles.
+
+\[
+\text{AWT} = \frac{\sum \text{Waiting Time of all processes}}{\text{Number of processes}}
+\]
+
+\subsection*{Average Turnaround Time (ATT)}
+The average total time from when a process arrives to when it completes. Shows how long processes typically remain in the system. A lower ATT generally means faster processing across the system.
+
+\[
+\text{ATT} = \frac{\sum \text{Turnaround Time of all processes}}{\text{Number of processes}}
+\]
+
+\[
+\text{Turnaround Time} = \text{Completion Time} - \text{Arrival Time}
+\]
+
+\subsection*{CPU Utilization}
+The percentage of time the CPU is actively working. A higher utilization means better resource management as the CPU is being used maximally; however, this can be an issue if a system spends too much time in this state.
+
+\[
+\text{CPU Utilization} = \frac{\text{CPU Busy Time}}{\text{Total Time}} \times 100
+\]
+
+\subsection*{Throughput}
+The number of processes completed per unit time. This is a ratio that demonstrates how quickly tasks are completed through time.
+
+\[
+\text{Throughput} = \frac{\text{Number of Completed Processes}}{\text{Total Time}}
+\]
+
+\subsection*{Response Time}
+The time from when a process arrives to when it first starts executing. A strong indicator of responsiveness in a system especially if it is very sensitive to delays.
+
+\[
+\text{Response Time} = \text{Start Time} - \text{Arrival Time}
+\]
+
+\section*{Testing Scenarios}
+\begin{itemize}
+    \item \textbf{Heavy Burst} How well the algorithm handles long-running processes.
+    \item \textbf{Mixed Priority} How effectively Priority Scheduling algorithms operate.
+    \item \textbf{Mixed Burst} How well the scheduling algorithm handles different process sizes.
+    \item \textbf{Same Arrival Time} Pure decision-making based on burst time, priority, or order.
+\end{itemize}
+
+\section*{Results}
+Below are the aggregated results of each test scenario. The results will be discussed and evaluated in the next section. All test were performed with same time quantum of 10.
+
+\begin{figure}
+    \centering
+    \includegraphics[width=1\linewidth]{HeavyBurst.png}
+    \caption{Heavy Burst Scenario}
+    \label{fig:enter-label}
+\end{figure}
+\begin{figure}
+    \centering
+    \includegraphics[width=1\linewidth]{MixedPriority.png}
+    \caption{Mixed Priority Scenario}
+    \label{fig:enter-label}
+\end{figure}
+\begin{figure}
+    \centering
+    \includegraphics[width=1\linewidth]{MixedBurst.png}
+    \caption{Mixed Burst Scenario}
+    \label{fig:enter-label}
+\end{figure}
+\begin{figure}
+    \centering
+    \includegraphics[width=1\linewidth]{SameArrival.png}
+    \caption{Same Arrival Scenario}
+    \label{fig:enter-label}
+\end{figure}
+
+\chapter{Analysis and Discussion}
+
+\subsection*{Heavy Burst Scenario}
+This scenario involved long burst processes that challenge the scheduler’s ability to handle short vs. long tasks efficiently.
+
+\begin{itemize}
+    \item \textbf{SJF}, \textbf{SRTF}, and \textbf{HRRN} performed best across all timing metrics.
+    \item \textbf{FCFS} and \textbf{RR} suffered due to the \textit{convoy effect}, where long processes delayed all others.
+    \item \textbf{Priority Scheduling} underperformed due to fixed priorities and lack of aging.
+\end{itemize}
+
+\subsection*{Mixed Burst Scenario}
+This scenario contained a variety of short and long processes, testing the adaptability of each algorithm.
+
+\begin{itemize}
+    \item \textbf{SRTF} had the lowest turnaround, waiting, and completion times.
+    \item \textbf{RR} performed poorly due to uniform time slicing, which ignores job length.
+    \item \textbf{HRRN} and \textbf{SJF} adapted well to the workload mix.
+\end{itemize}
+
+\subsection*{Mixed Priority Scenario}
+Processes had varying priority levels to test fairness and the risk of starvation.
+
+\begin{itemize}
+    \item \textbf{HRRN} performed well by accounting for waiting time, reducing starvation.
+    \item \textbf{Priority Scheduling} suffered due to static prioritization, causing lower-priority jobs to wait indefinitely.
+    \item \textbf{SJF} and \textbf{SRTF} still showed good results based on burst awareness.
+\end{itemize}
+
+\subsection*{Same Arrival Time Scenario}
+All processes arrived at time zero, highlighting pure algorithm behavior without arrival dynamics.
+
+\begin{itemize}
+    \item \textbf{SJF}, \textbf{SRTF}, and \textbf{HRRN} efficiently prioritized short jobs.
+    \item \textbf{FCFS} and \textbf{RR} performed worst as they lacked prioritization and adaptability.
+    \item \textbf{Throughput and CPU utilization} were consistent across most algorithms.
+\end{itemize}
+
+\subsection*{Overall Comparison}
+\begin{table}[h!]
+    \centering
+    \begin{tabular}{|l|p{4.5cm}|p{4.5cm}|}
+        \hline
+            \textbf{Algorithm} & \textbf{Strengths} & \textbf{Weaknesses} \\
+        \hline
+            FCFS & Simple, fair by arrival order & Suffers convoy effect, poor under mixed/long jobs \\
+        \hline
+            SJF & Excellent average times when burst is known & Not preemptive; long tasks can be delayed \\
+        \hline
+            Priority & Useful for urgent task handling & Can starve low-priority jobs without aging \\
+        \hline
+            Round Robin (RR) & Fair, responsive in time-sharing systems & Poor turnaround and waiting under heavy load \\
+        \hline
+            SRTF & Optimal in turnaround and wait time; preemptive & Needs accurate burst estimation; complex switching \\
+        \hline
+            HRRN & Balances fairness and efficiency; prevents starvation & Slightly more complex to implement \\
+        \hline
+        \end{tabular}
+    \caption{Summary of Algorithm Strengths and Weaknesses}
+    \label{tab:algorithm-summary}
+\end{table}
+
+\chapter{Challenges and Lessons Learned}
+This project presented quite a few challenges around understanding scheduling algorithms and the flow they follow. It was also difficult working in a existing code base as things were designed and structured very differently than I would have set it up.
+
+\subsection*{Existing Repository}
+The first challenge I faced was getting the existing source code working on my machine. This took a lot of trial and error as things were dated. Once it was working the code had a lot of short hand and difficult to understand variable names. While I wanted to touch as little as possible of the old code I needed to alter it quite a bit to use the Process Control Block class I had created so the results could be displayed together.
+
+\subsection*{Algorithm Creation}
+Creating the SRTF and HRRN was difficult as there are a lot of factors to consider. I frequently used the debugger in C\# to step through the code. I initially used a lot of loops and juggled the different values as the existing code did but once I found out that C\# had a similar concept to Java streams it was a lot easier to streamline the logic. It even helped when I went back to update the old methods to use the PCB class. 
+
+\chapter{Conclusion and Insights}
+The standout performer across most scenarios was the Shortest Remaining Time First (SRTF) algorithm. It consistently outperformed the other scheduling strategies in all test cases except the Same Arrival Time scenario, where it tied with Shortest Job First (SJF). This result is expected, as in that scenario no preemption was needed — all processes arrived simultaneously, and SJF could operate as effectively as SRTF without switching overhead.
+
+The Highest Response Ratio Next (HRRN) algorithm was also a strong performer. It provided a balanced approach by considering both waiting time and burst time, allowing it to adapt well across varied workloads. I considered whether a preemptive version of HRRN could perform even better, but the potential gain might not justify the added complexity and overhead from frequent recalculations and context switches.
+
+Overall, algorithms that took burst time into account — such as SJF, SRTF, and HRRN — consistently outperformed simpler strategies like First-Come, First-Serve (FCFS) and Round Robin (RR). These simpler methods failed to prioritize short tasks effectively, resulting in longer turnaround and waiting times due to the convoy effect and uniform time slicing.
+
+Priority Scheduling placed in the middle of the pack. Its performance was likely limited by the use of randomly assigned priorities. With a more thoughtful or workload-aware priority scheme, this algorithm could potentially perform much better.
+
+In summary, the evaluation highlights that awareness of burst time and adaptive prioritization are key factors in achieving better scheduling performance. Simpler algorithms offer fairness and predictability but often fall short in efficiency, especially under mixed workloads.
+\bibliography{myBib}
+
+\end{document}

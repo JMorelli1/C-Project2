@@ -11,9 +11,9 @@ public class CompareDisplay : Form
     private ScottPlot.WinForms.FormsPlot waitTimePlot;
     private ScottPlot.WinForms.FormsPlot completionTimePlot;
 
-    public CompareDisplay(List<AlgorithmResults> algorithmResults)
+    public CompareDisplay(string fileName, List<AlgorithmResults> algorithmResults)
     {
-        this.Text = "Scheduling Results";
+        this.Text = $"Scheduling Results {fileName}";
         this.Width = 700;
         this.Height = 900;
 
@@ -198,8 +198,8 @@ public class CompareDisplay : Form
 
         // Axis labels and title
         completionTimePlot.Plot.Axes.Bottom.Label.Text = "Algorithm";
-        completionTimePlot.Plot.Axes.Left.Label.Text = "Avg Wait Time";
-        completionTimePlot.Plot.Title("Avg Wait Time");
+        completionTimePlot.Plot.Axes.Left.Label.Text = "Avg Completion Time";
+        completionTimePlot.Plot.Title("Avg Completion Time");
 
         completionTimePlot.Refresh();
     }
